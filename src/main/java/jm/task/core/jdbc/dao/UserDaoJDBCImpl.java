@@ -12,11 +12,9 @@ public class UserDaoJDBCImpl implements UserDao {
 
     }
 
-
-
     public void createUsersTable() {
+        Connection connection = Util.getConnection();
         try {
-            Connection connection = Util.getConnection();
             Statement statement = connection.createStatement();
             statement.execute("CREATE TABLE IF NOT EXISTS `users` (\n" +
                     "                      `id` INT NOT NULL AUTO_INCREMENT,\n" +
@@ -27,24 +25,34 @@ public class UserDaoJDBCImpl implements UserDao {
                     "                      UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE);");
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
         }
     }
 
     public void dropUsersTable() {
+        Connection connection = Util.getConnection();
         try {
-            Connection connection = Util.getConnection();
             Statement statement = connection.createStatement();
             statement.execute("DROP TABLE IF EXISTS users;");
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
         }
     }
 
     public void saveUser(String name, String lastName, byte age) {
+        Connection connection = Util.getConnection();
         try {
-            Connection connection = Util.getConnection();
             PreparedStatement statement = connection.prepareStatement("INSERT INTO users (`name`, `lastName`, `age`) VALUES (?, ?, ?);");
             statement.setString(1, name);
             statement.setString(2, lastName);
@@ -52,26 +60,36 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
         }
 
     }
 
     public void removeUserById(long id) {
+        Connection connection = Util.getConnection();
         try {
-            Connection connection = Util.getConnection();
             PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE `id` = ?;");
             statement.setLong(1, id);
             statement.execute();
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
         }
     }
 
     public List<User> getAllUsers() {
+        Connection connection = Util.getConnection();
         try {
-            Connection connection = Util.getConnection();
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery("SELECT * FROM users");
             connection.commit();
@@ -86,6 +104,11 @@ public class UserDaoJDBCImpl implements UserDao {
             }
             return users;
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
         }
     }
@@ -97,6 +120,11 @@ public class UserDaoJDBCImpl implements UserDao {
             statement.execute("TRUNCATE TABLE users;");
             connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                throw new RuntimeException(ex);
+            }
             throw new RuntimeException(e);
         }
     }
