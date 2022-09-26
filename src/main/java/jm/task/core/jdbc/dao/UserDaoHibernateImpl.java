@@ -9,6 +9,8 @@ import javax.persistence.criteria.CriteriaQuery;
 import java.util.List;
 
 public class UserDaoHibernateImpl implements UserDao {
+    private static final String DELETE_USERS = "delete from User";
+
     public UserDaoHibernateImpl() {
 
     }
@@ -98,8 +100,7 @@ public class UserDaoHibernateImpl implements UserDao {
         Transaction transaction = null;
         try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            String sql = "TRUNCATE TABLE users;";
-            session.createNativeQuery(sql).executeUpdate();
+            session.createQuery(DELETE_USERS).executeUpdate();
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
